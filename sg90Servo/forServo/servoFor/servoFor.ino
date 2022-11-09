@@ -7,14 +7,14 @@ void setup() {
 }
 
 void loop() {
-  for(aci=0;aci<=180;aci+=1){
+  for(aci=0;aci<=180;aci++){
     servoKontrol.write(aci);
     delay(50);
   }
 
   delay(3000);
 
-  for(aci=180;aci>=0;aci-=1){
+  for(aci=180;aci>=0;aci--){
     servoKontrol.write(aci);
     delay(50);
   }

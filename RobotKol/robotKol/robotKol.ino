@@ -22,7 +22,7 @@ void loop() {
 
   //Analog değerler map ile servo açılarına sınırlandırılıyor
   int sag_sol_aci = map(sag_sol, 0, 1023, 0,179);
-  int ileri_geri_aci = map(ileri_geri, 1023, 0, 20,150);
+  int ileri_geri_aci = map(ileri_geri, 0, 1023, 20,150);
   int asagi_yukari_aci = map(asagi_yukari, 0, 1023, 50,150);
   int kiskac_aci = map(kiskac, 0, 1023, 10,90);
 

@@ -1,6 +1,6 @@
-int echoPin = 6
-int trigPin = 7
-#define buzzerPin 8
+#define buzzerPin 9
+int echoPin = 10;
+int trigPin = 11;
 
 int maxDeger = 400;
 int minDeger = 0;

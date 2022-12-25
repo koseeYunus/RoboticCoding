@@ -1,7 +1,7 @@
 #include "NewPing.h"
 
-#define Trig_Pin 9
-#define Echo_Pin 10
+#define Trig_Pin 10
+#define Echo_Pin 11
 #define Max_Uzaklik 400  
 
 NewPing sonar(Trig_Pin, Echo_Pin, Max_Uzaklik);

@@ -1,20 +1,21 @@
-#include <MaxMatrix.h>
-#include <avr/pgmspace.h>
-PROGMEM prog_uchar CH[] = {
+#include "MaxMatrix.h"
+#include "avr/pgmspace.h"
+
+PROGMEM const unsigned char CH[] = {
 3, 8, B00000000, B00000000, B00000000, B00000000, B00000000, // space
 1, 8, B01011111, B00000000, B00000000, B00000000, B00000000, // !
-3, 8, B00000011, B00000000, B00000011, B00000000, B00000000, // "
+3, 8, B00000011, B00000000, B00000011, B00000000, B00000000, // ”
 5, 8, B00010100, B00111110, B00010100, B00111110, B00010100, // #
 4, 8, B00100100, B01101010, B00101011, B00010010, B00000000, // $
 5, 8, B01100011, B00010011, B00001000, B01100100, B01100011, // %
 5, 8, B00110110, B01001001, B01010110, B00100000, B01010000, // &
-1, 8, B00000011, B00000000, B00000000, B00000000, B00000000, // '
+1, 8, B00000011, B00000000, B00000000, B00000000, B00000000, // ‘
 3, 8, B00011100, B00100010, B01000001, B00000000, B00000000, // (
 3, 8, B01000001, B00100010, B00011100, B00000000, B00000000, // )
 5, 8, B00101000, B00011000, B00001110, B00011000, B00101000, // *
 5, 8, B00001000, B00001000, B00111110, B00001000, B00001000, // +
 2, 8, B10110000, B01110000, B00000000, B00000000, B00000000, // ,
-4, 8, B00001000, B00001000, B00001000, B00001000, B00000000, // -
+4, 8, B00001000, B00001000, B00001000, B00001000, B00000000, // –
 2, 8, B01100000, B01100000, B00000000, B00000000, B00000000, // .
 4, 8, B01100000, B00011000, B00000110, B00000001, B00000000, // /
 4, 8, B00111110, B01000001, B01000001, B00111110, B00000000, // 0
@@ -29,9 +30,7 @@ PROGMEM prog_uchar CH[] = {
 4, 8, B00000110, B01001001, B01001001, B00111110, B00000000, // 9
 2, 8, B01010000, B00000000, B00000000, B00000000, B00000000, // :
 2, 8, B10000000, B01010000, B00000000, B00000000, B00000000, // ;
-3, 8, B00010000, B00101000, B01000100, B00000000, B00000000, // <
-3, 8, B00010100, B00010100, B00010100, B00000000, B00000000, // =
-3, 8, B01000100, B00101000, B00010000, B00000000, B00000000, // >
+3, 8, B00010000, B00101000, B01000100, B00000000, B00000000, //
 4, 8, B00000010, B01011001, B00001001, B00000110, B00000000, // ?
 5, 8, B00111110, B01001001, B01010101, B01011101, B00001110, // @
 4, 8, B01111110, B00010001, B00010001, B01111110, B00000000, // A
@@ -97,42 +96,52 @@ PROGMEM prog_uchar CH[] = {
 3, 8, B01000001, B00110110, B00001000, B00000000, B00000000, // }
 4, 8, B00001000, B00000100, B00001000, B00000100, B00000000, // ~
 };
-int data = 8;    // DIN pin of MAX7219 module
-int load = 9;    // CS pin of MAX7219 module
-int clock = 10;  // CLK pin of MAX7219 module
-int maxInUse = 2;  //how many MAX7219 are connected
+
+int data = 8; // DIN pin of MAX7219 module
+int load = 9; // CS pin of MAX7219 module
+int clock = 10; // CLK pin of MAX7219 module
+
+int maxInUse = 2; //how many MAX7219 are connected
+
 MaxMatrix m(data, load, clock, maxInUse); // define Library
+
 byte buffer[10];
-char string1[] = "TUGVVA'YA HOSGELDINIZ";  // Scrolling Text
+
+char string1[] = "TUGVA'YA HOSGELDINIZ"; // Scrolling Text
+
 void setup(){
-  m.init(); // module MAX7219
-  m.setIntensity(5); // LED Intensity 0-15
+m.init(); // module MAX7219
+m.setIntensity(5); // LED Intensity 0-15
 }
+
 void loop(){
-  
-  byte c;
-  delay(100);
-  m.shiftLeft(false, true);
-  printStringWithShift(string1, 100);  // Send scrolling Text
+
+byte c;
+delay(100);
+m.shiftLeft(false, true);
+printStringWithShift(string1, 100); // Send scrolling Text
+
 }
+
 // Put extracted character on Display
 void printCharWithShift(char c, int shift_speed){
-  if (c < 32) return;
-  c -= 32;
-  memcpy_P(buffer, CH + 7*c, 7);
-  m.writeSprite(maxInUse*8, 0, buffer);
-  m.setColumn(maxInUse*8 + buffer[0], 0);
-  
-  for (int i=0; i<buffer[0]+1; i++) 
-  {
-    delay(shift_speed);
-    m.shiftLeft(false, false);
-  }
+if (c < 32) return;
+c -= 32;
+memcpy_P(buffer, CH + 7*c, 7);
+m.writeSprite(maxInUse*8, 0, buffer);
+m.setColumn(maxInUse*8 + buffer[0], 0);
+
+for (int i = 0; i < buffer[0]+1; i++)
+{
+delay(shift_speed);
+m.shiftLeft(false, false);
 }
+}
+
 // Extract characters from Scrolling text
 void printStringWithShift(char* s, int shift_speed){
-  while (*s != 0){
-    printCharWithShift(*s, shift_speed);
-    s++;
-  }
+while (*s != 0){
+printCharWithShift(*s, shift_speed);
+s++;
+}
 }

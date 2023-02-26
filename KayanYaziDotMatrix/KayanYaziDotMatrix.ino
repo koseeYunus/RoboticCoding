@@ -103,13 +103,13 @@ int data = 8; // DIN pin of MAX7219 module
 int load = 9; // CS pin of MAX7219 module
 int clock = 10; // CLK pin of MAX7219 module
 
-int maxInUse = 2; //how many MAX7219 are connected
+int maxInUse = 9; //how many MAX7219 are connected
 
 MaxMatrix m(data, load, clock, maxInUse); // define Library
 
 byte buffer[10];
 
-char string1[] = "TUGVA'YA HOSGELDINIZ"; // Scrolling Text
+char string1[] = "Gecmis Olsun Turkiyem (Hatay, Adıyaman, Kahramanmaras, Gaziantep, Adana, Malatya, Kilis, Osmaniye, Diyarbakır, Sanliurfa ve Elazig) Dualarımız Sizinle..."; // Scrolling Text
 
 void setup(){
 m.init(); // module MAX7219

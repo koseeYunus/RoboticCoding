@@ -47,7 +47,6 @@ ISR(TIMER1_COMPA_vect)
    say++; 
 }
 
-}
 
 void loop() {
 
@@ -56,11 +55,18 @@ void loop() {
   digitalWrite(digit3,0);
   digitalWrite(digit4,0);
 
-  for(int a=0; a<10; a++){
-    for(int j=0; j<7; j++){
-      digitalWrite(j+2, dizi[a][j]);
-    }
-    delay(1000);
+  for(int j=0; j<7; j++){
+    digitalWrite(j+2, dizi[(say/1)%10][j]);
+  }
+  delay(5);
+
+  digitalWrite(digit1,0);
+  digitalWrite(digit2,1);
+  digitalWrite(digit3,0);
+  digitalWrite(digit4,0);
+
+  for(int j=0; j<7; j++){
+    digitalWrite(j+2, dizi[(say/10)%10][j]);
   }
   delay(5);
 

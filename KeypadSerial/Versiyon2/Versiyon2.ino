@@ -47,16 +47,34 @@ void loop() {
     digitalWrite(sariLed, 0);
     digitalWrite(buzzer, 0);    
 
-    if(gelenKarakter == "#"){
+    if(gelenKarakter == '#'){
       //Doğrumu yanlışmı kodlarım olacak burada
+      if(gelenSifre==sifre){
+      Serial.println("SİFRE DOGRU... ");
+      gelenSifre="";
+      digitalWrite(yesilLed,1);
+      digitalWrite(buzzer,1);
+      delay(50);
+      digitalWrite(buzzer,0);
+      delay(25);
+      digitalWrite(buzzer,1);
+      delay(50);
+      digitalWrite(yesilLed,0);
+      }
+      else{
+      Serial.println("SIFRE YANLIS!!! ");
+      gelenSifre="";
+      digitalWrite(kirmiziLed, 1);
+      digitalWrite(buzzer,1);
+      delay(500);
+      digitalWrite(buzzer,0);
+      digitalWrite(kirmiziLed,0);
+      }
     }
     
     
 
-    if(gelenSifre==sifre){
-      Serial.println("SİFRE DOGRU... ");
-      gelenSifre="";
-    }
+    
      
   }
 

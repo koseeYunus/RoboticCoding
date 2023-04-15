@@ -44,7 +44,7 @@ void loop()
   Serial.println(on_uzaklik);
   //delay(2000);
 
-  if(on_uzaklik > 20 || on_uzaklik <= 2)
+  if(on_uzaklik > 35 || on_uzaklik == 0)
   {
     ileri();
   }
@@ -74,18 +74,19 @@ void loop()
     if(sag_uzaklik>sol_uzaklik)
     {
       sag();
-      delay(200);
+      delay(300);
       ileri();
     }
     else if(sol_uzaklik >sag_uzaklik)
     {
       sol();
-      delay(200);
+      delay(300);
       ileri();
     }
     else
     {
       geri();
+      delay(200);
     }
   }
 }

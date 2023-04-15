@@ -3,10 +3,10 @@
 
 
 //motor pinleri
-#define SolMotorileri 2
+#define SolMotorileri 5
 #define SolMotorGeri 3
-#define SagMotorileri 4
-#define SagMotorGeri 5
+#define SagMotorileri 10
+#define SagMotorGeri 9
 //sensör pinleri
 #define USTrigger 6
 #define USEcho 7
@@ -17,8 +17,8 @@ NewPing sonar(USTrigger, USEcho, Maksimum_uzaklik);//ultrasonik sensör tanımla
 //kullanılacak eleman tanımı
 int uzaklik;
 int on_uzaklik;
-int sol_uzaklik;
-int sag_uzaklik;
+int sol_uzaklik=0;
+int sag_uzaklik=0;
 int zaman;
 
 // program ilk çalıştığında sadece bir kez çalışacak programlar
@@ -72,8 +72,10 @@ void loop()
       Serial.println(sag_uzaklik);
       //delay(2000);
     }
+
     servo.write(90);
     delay(500);
+
     if(sag_uzaklik>sol_uzaklik)
     {
       sag();
@@ -97,10 +99,10 @@ void loop()
 // robotun yön komutları
 void ileri()
 {
-digitalWrite(SolMotorGeri, LOW);
-digitalWrite(SolMotorileri, HIGH);
-digitalWrite(SagMotorGeri, LOW);
-digitalWrite(SagMotorileri, HIGH);
+analogWrite(SolMotorGeri, 0);
+analogWrite(SolMotorileri, 255);
+analogWrite(SagMotorGeri, 0);
+analogWrite(SagMotorileri, 255);
 }
   
 void geri()

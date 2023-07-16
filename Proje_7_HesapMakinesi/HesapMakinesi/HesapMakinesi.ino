@@ -12,17 +12,17 @@ char keys[ROWS][COLS] = {
 };
 
 
-byte rowPins[ROWS] = { 2, 3, 4, 5 };
-byte colPins[COLS] = { 6, 7, 8, 9 };
+byte rowPins[ROWS] = {9, 8, 7, 6}; // satır pinleri
+byte colPins[COLS] = {5, 4, 3, 2}; //  sutun pinleri
 
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
-LiquidCrystal lcd(10, 11, A0, A1, A2, A3);
+LiquidCrystal lcd(10, 11, 2, 3, 4, 5);
 
  long Num1,Num2,Number;
  char key,action;
- boolean result = false;
+ boolean durum = false;
 
 
 void setup() {
@@ -39,19 +39,19 @@ void loop() {
   key = keypad.getKey(); // Basılan tuşun değerini char olarak depolama
 
   if (key!=NO_KEY){
-    DetectButtons();
+    TusAlgila();
   }
   
-  if (result==true){
-    CalculateResult();
+  if (durum==true){
+    SonucuHesapla();
   }
   
-  DisplayResult();   
+  EkranaYaz();   
 
 }
-void DetectButtons()
+void TusAlgila()
 { 
-    lcd.clear(); //Temizle
+    lcd.clear(); //LCD Temizle
 
     
     if(key == '0') //Eğer 0 düğmesi basıldığında
@@ -149,14 +149,14 @@ void DetectButtons()
     {
       Serial.println("Sifirlaniyor..."); 
       Number=Num1=Num2=0; 
-      result=false;
+      durum=false;
     }
 
     if(key == '#') //Eğer # düğmesi basıldığında
     {
       Serial.println("Hesaplaniyor.."); 
       Num2=Number;
-      result = true;
+      durum = true;
     }
 
 
@@ -168,28 +168,32 @@ void DetectButtons()
       Num1 = Number;    
       Number = 0;
 
-      if(key == 'A')
-      {
-        Serial.println ("Topla"); 
+      if(key == 'A'){
+        Serial.println("Topla"); 
         action = '+';
       } //Toplama
+
       if(key == 'B'){
-       Serial.println ("Cikar"); 
+       Serial.println("Cikar"); 
        action = '-'; 
        } //Çıkarma
+
       if(key == 'C'){
-       Serial.println ("Carp"); 
+       Serial.println("Carp"); 
        action = '*';
        } //Çarpma
+
       if(key == 'D'){
-       Serial.println ("Bol"); 
+       Serial.println("Bol"); 
        action = '/';
        }  // //Bölme
+
       delay(100);
   }
 
 }
-void CalculateResult()
+
+void SonucuHesapla()
 {
   if (action=='+')
     Number = Num1+Num2;
@@ -200,14 +204,15 @@ void CalculateResult()
   if (action=='/')
     Number = Num1/Num2; 
 }
-void DisplayResult()
+
+void EkranaYaz()
 {
   lcd.setCursor(0, 0); //Göstergeyi sütun 0, satır 1’e ayarla
   lcd.print(Num1); 
   lcd.print(action); 
   lcd.print(Num2); 
 
-  if (result==true){
+  if (durum==true){
     lcd.print(" = "); 
     lcd.print(Number);
     } //Sonucu göster

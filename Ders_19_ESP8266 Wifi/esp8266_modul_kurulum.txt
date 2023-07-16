@@ -1,0 +1,4 @@
+- Arduino IDE’sini açın ve, File -> Preferences seçeneğine tıklayın.
+- Açılan pencerede “Additional Board Manager URLs” kısmına http://arduino.esp8266.com/stable/package_esp8266com_index.json linkini kopyalayıp yapıştırın. “OK” kutucuğuna basarak işlemi onaylayın.
+- Tools -> Board -> Boards Manager seçeneklerine sırayla tıklayın.
+- Açılan “Boards Manager” penceresinde arama kutucuğuna “esp8266” yazın ve çıkan kütüphaneyi “Install” tuşuna basarak yükleyin.

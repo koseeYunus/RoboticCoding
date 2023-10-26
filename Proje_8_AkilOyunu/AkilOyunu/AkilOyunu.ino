@@ -1,192 +1,189 @@
-const int button1 = 2;           
-const int button2 = 3;          
-const int button3 = 4;          
-const int button4 = 5;        
-  
-const int led1 = 7;             
-const int led2 = 8;             
-const int led3 = 9;             
-const int led4 = 10;    
-       
-const int buzzer = 12;   
+#define PLAYER_WAIT_TIME 2000 // The time allowed between button presses  - 2s 
 
-int game_on = 0;
-int wait = 0;
-int currentlevel = 1; 
-long rand_num = 0; 
-int rando = 0; 
-int butwait = 500; 
-int ledtime = 500; 
-int n_levels = 10; 
-int pinandtone = 0; 
-int right = 0; 
-int speedfactor = 5; 
-int leddelay = 200; 
-       
+byte sequence[100];           // Storage for the light sequence
+byte  curLen = 0;              // Current length of the sequence
+byte inputCount =  0;          // The number of times that the player has pressed a (correct) button  in a given turn 
+byte lastInput = 0;           // Last input from the player
+byte  expRd = 0;               // The LED that's suppose to be lit by the player
+bool  btnDwn = false;          // Used to check if a button is pressed
+bool wait =  false;            // Is the program waiting for the user to press a button
+bool  resetFlag = false;       // Used to indicate to the program that once the player  lost
 
-const int tones[] = {261, 349, 392, 440, 2700}; 
+byte soundPin = 11;            // Speaker output
 
+byte noPins =  4;              // Number of buttons/LEDs (While working on this, I was using only  2 LEDs)
+                              // You could make the game harder by adding  an additional LED/button/resistors combination.
+byte pins[] = {2, 3, 4, 5};  // Button input pins and LED ouput pins - change these vaules if you wwant to connect  yourbuttons to other pins
+                              // The number of elements  must match noPins below
+                              
+long inputTime = 0;           // Timer variable for the delay between user inputs
 
-int buttonState[] = {0,0,0,0};         
-int lastButtonState[] = {0,0,0,0};    
-int buttonPushCounter[] = {0,0,0,0}; 
+void setup()  {
+  delay(3000);                // This is to give me time to breathe after connection  the arduino - can be removed if you want
+  Serial.begin(9600);         // Start  Serial monitor. This can be removed too as long as you remove all references to  Serial below
+  Reset();
+}
 
-
-void playTone(int tone, int duration) {
-  for (long i = 0; i < duration * 1000L; i += tone * 2) {
-    digitalWrite(buzzer, HIGH);
-    delayMicroseconds(tone);
-    digitalWrite(buzzer, LOW);
-    delayMicroseconds(tone);
+///
+/// Sets all the pins as either INPUT  or OUTPUT based on the value of 'dir'
+///
+void setPinDirection(byte dir){
+  for(byte i = 0; i < noPins; i++){
+    pinMode(pins[i], dir); 
   }
 }
 
-void setup() {
- 
-  randomSeed(analogRead(0));
-  
-  pinMode(button1, INPUT);
-  pinMode(button2, INPUT);
-  pinMode(button3, INPUT);
-  pinMode(button4, INPUT);
- 
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(led3, OUTPUT);
-  pinMode(led4, OUTPUT);
-  
-  pinMode(buzzer, OUTPUT);
-  
-
+//send  the same value to all the LED pins
+void writeAllPins(byte val){
+  for(byte  i = 0; i < noPins; i++){
+    digitalWrite(pins[i], val); 
+  }
 }
 
+//Makes  a (very annoying :) beep sound
+void beep(byte freq){
+  analogWrite(soundPin,  2);
+  delay(freq);
+  analogWrite(soundPin, 0);
+  delay(freq);
+}
 
-void loop() {
-  
-  int n_array[n_levels];
-  int u_array[n_levels];
-
-  int i;
-
-  if (game_on == 0){
-    for(i=0; i<n_levels; i=i+1){
-            n_array[i]=0;
-            u_array[i]=0;
-            rand_num = random(1,200);
-            if (rand_num <= 50)
-              rando=0;
-            else if (rand_num>50 && rand_num<=100)
-              rando=1;
-            else if (rand_num>100 && rand_num<=150)
-              rando=2;
-            else if (rand_num<=200)
-              rando=3;
-            
-            n_array[i]=rando;
-          }
-    game_on = 1; 
-
+///
+///  Flashes all the LEDs together
+/// freq is the blink speed - small number -> fast  | big number -> slow
+///
+void flash(short freq){
+  setPinDirection(OUTPUT);  /// We're activating the LEDS now
+  for(int i = 0; i < 5; i++){
+    writeAllPins(HIGH);
+    beep(50);
+    delay(freq);
+    writeAllPins(LOW);
+    delay(freq);
   }
+}
 
-  if (wait == 0){
-    delay (200);
-    i = 0;
-    for (i = 0; i < currentlevel; i= i + 1){
-      leddelay = ledtime/(1+(speedfactor/n_levels)*(currentlevel - 1));
-      pinandtone = n_array[i];
-      digitalWrite(pinandtone+7, HIGH);
-      playTone(tones[pinandtone], leddelay);
-      digitalWrite(pinandtone+7, LOW);
-      delay(100/speedfactor);
-    }
-    wait = 1;
-  }
+///
+///This function resets all the game variables to their default  values
+///
+void Reset(){
+  flash(500);
+  curLen = 0;
+  inputCount  = 0;
+  lastInput = 0;
+  expRd = 0;
+  btnDwn = false;
+  wait = false;
+  resetFlag = false;
+}
 
-  i = 0;
-  int buttonchange = 0;    
-  int j = 0; 
-  while (j < currentlevel){    
-      while (buttonchange == 0){
-            for (i = 0; i < 4; i = i + 1){ 
-              buttonState[i] = digitalRead(i+2);
-              buttonchange = buttonchange + buttonState[i];
-            }
-      }
-      for (i = 0; i < 4; i = i + 1){
-          if (buttonState[i] == HIGH) {
-              digitalWrite(i+7, HIGH);
-              playTone(tones[i], ledtime);
-              digitalWrite(i+7, LOW);
-              wait = 0;
-              u_array[j]=i; 
-              buttonState[i] = LOW;
-              buttonchange = 0;
-          }
-        } 
-          if (u_array[j] == n_array[j]){
-              j++;  
-              right = 1;
-              }
-          else{
-            
-              right = 0;
-              i = 4;
-              j = currentlevel;
-              wait = 0;
-          }
-  }
+///
+/// User lost
+///
+void Lose(){
+  flash(50);  
+}
 
-  if (right == 0){
-    delay(300);
-    i = 0;
-    game_on = 0;
-    currentlevel = 1;
-    for (i = 0; i < 4; i = i + 1){
-          digitalWrite(i+7, HIGH);
-        }
-            playTone(tones[4], ledtime);
-    for (i = 0; i < 4; i = i + 1){
-          digitalWrite(i+7, LOW);   
-        }
-        delay (200);
-    for (i = 0; i < 4; i = i + 1){
-          digitalWrite(i+7, HIGH);
-        }
-            playTone(tones[4], ledtime);
-    for (i = 0; i < 4; i = i + 1){
-          digitalWrite(i+7, LOW);   
-        }
+///
+/// The arduino shows the user what must be memorized
+///  Also called after losing to show you what you last sequence was
+///
+void playSequence(){
+  //Loop through the stored sequence and light the appropriate LEDs in turn
+  for(int i = 0; i < curLen; i++){
+      Serial.print("Seq: ");
+      Serial.print(i);
+      Serial.print("Pin: ");
+      Serial.println(sequence[i]);
+      digitalWrite(sequence[i],  HIGH);
+      delay(500);
+      digitalWrite(sequence[i], LOW);
+      delay(250);
+    } 
+}
+
+///
+/// The events that occur upon a loss
+///
+void DoLoseProcess(){
+  Lose();             // Flash all the LEDS quickly (see Lose function)
+  delay(1000);
+  playSequence();     // Shows the user the last sequence - So you can count remember  your best score - Mine's 22 by the way :)
+  delay(1000);
+  Reset();            //  Reset everything for a new game
+}
+
+///
+/// Where the magic happens
+///
+void  loop() {  
+  if(!wait){      
+                            //****************//
+                            // Arduino's turn //
+                            //****************//
+    setPinDirection(OUTPUT);                      // We're using the LEDs
+    
+    randomSeed(analogRead(A0));                   // https://www.arduino.cc/en/Reference/RandomSeed
+    sequence[curLen] = pins[random(0,noPins)];    // Put a new random value in the  next position in the sequence -  https://www.arduino.cc/en/Reference/random
+    curLen++;                                     // Set the new Current length  of the sequence
+    
+    playSequence();                               //  Show the sequence to the player
+    beep(50);                                     //  Make a beep for the player to be aware
+    
+    wait = true;                                  //  Set Wait to true as it's now going to be the turn of the player
+    inputTime  = millis();                         // Store the time to measure the player's response  time
+  }else{ 
+                            //***************//
+                            //  Player's turn //
+                            //***************//
+    setPinDirection(INPUT);                       // We're using the buttons
+
+    if(millis() - inputTime  > PLAYER_WAIT_TIME){  // If the player takes more than the allowed time,
+      DoLoseProcess();                            // All is lost :(
+      return;
+    }      
         
-        delay(500);
-        game_on = 0;
-  }
-
-
-
-  if (right == 1){
-      currentlevel++;
-      wait = 0;
-      }
-    
-  if (currentlevel == n_levels){
-    delay(500);
-    
-    int notes[] = {2, 2, 2, 2, 0, 1, 2, 1, 2};
-    int note = 0;
-    int tempo[] = {200, 200, 200, 400, 400, 400, 200, 200, 600}; 
-    int breaks[] = {100, 100, 100, 200, 200, 200, 300, 100, 200}; 
-    for (i = 0; i < 9; i = i + 1){
-    note = notes[i];
-      digitalWrite(note+7, HIGH);
-      playTone(tones[note], tempo[i]);
-      digitalWrite(note+7, LOW);
-      delay(breaks[i]);
+    if(!btnDwn){                                  // 
+      expRd  = sequence[inputCount];               // Find the value we expect from the player
+      Serial.print("Expected: ");                 // Serial Monitor Output - Should  be removed if you removed the Serial.begin above
+      Serial.println(expRd);                      // Serial Monitor Output - Should be removed if you removed  the Serial.begin above
+      
+      for(int i = 0; i < noPins; i++){           //  Loop through the all the pins
+        if(pins[i]==expRd)                        
+          continue;                               // Ignore the correct pin
+        if(digitalRead(pins[i]) == HIGH){         // Is the buttong pressed
+          lastInput = pins[i];
+          resetFlag = true;                       //  Set the resetFlag - this means you lost
+          btnDwn = true;                          //  This will prevent the program from doing the same thing over and over again
+          Serial.print("Read: ");                 // Serial Monitor Output - Should  be removed if you removed the Serial.begin above
+          Serial.println(lastInput);              // Serial Monitor Output - Should be removed if you removed the Serial.begin  above
+        }
+      }      
     }
 
-  game_on = 0;
-  currentlevel = 1;
-  n_levels = n_levels + 2;
-  speedfactor = speedfactor + 1;
+    if(digitalRead(expRd) ==  1 && !btnDwn)        // The player pressed the right button
+    {
+      inputTime  = millis();                       // 
+      lastInput = expRd;
+      inputCount++;                               // The user pressed a (correct) button again
+      btnDwn = true;                              // This will prevent the program  from doing the same thing over and over again
+      Serial.print("Read: ");                     // Serial Monitor Output - Should be removed if you removed  the Serial.begin above
+      Serial.println(lastInput);                  // Serial  Monitor Output - Should be removed if you removed the Serial.begin above
+    }else{
+      if(btnDwn && digitalRead(lastInput) == LOW){  // Check if the player released  the button
+        btnDwn = false;
+        delay(20);
+        if(resetFlag){                              // If this was set to true up above, you lost
+          DoLoseProcess();                          // So we do the losing sequence  of events
+        }
+        else{
+          if(inputCount == curLen){                 //  Has the player finished repeating the sequence
+            wait = false;                           //  If so, this will make the next turn the program's turn
+            inputCount  = 0;                         // Reset the number of times that the player has pressed  a button
+            delay(1500);
+          }
+        }
       }
- 
+    }    
+  }
 }

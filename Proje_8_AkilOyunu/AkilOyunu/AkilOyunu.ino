@@ -1,31 +1,31 @@
-#define PLAYER_WAIT_TIME 2000 // The time allowed between button presses  - 2s 
+#define PLAYER_WAIT_TIME 2000 // Düğmeye basmalar arasında izin verilen süre - 2 saniye
 
-byte sequence[100];           // Storage for the light sequence
-byte  curLen = 0;              // Current length of the sequence
-byte inputCount =  0;          // The number of times that the player has pressed a (correct) button  in a given turn 
-byte lastInput = 0;           // Last input from the player
-byte  expRd = 0;               // The LED that's suppose to be lit by the player
-bool  btnDwn = false;          // Used to check if a button is pressed
-bool wait =  false;            // Is the program waiting for the user to press a button
-bool  resetFlag = false;       // Used to indicate to the program that once the player  lost
+byte sequence[100];           // ışık dizisi için depolama
+byte  curLen = 0;              // Dizinin geçerli uzunluğu
+byte inputCount =  0;          // Oynatıcının belirli bir dönüşte (doğru) bir düğmeye kaç kez bastığı
+byte lastInput = 0;           // Oynatıcıdan son giriş
+byte  expRd = 0;               // Oynatıcı tarafından yanması gereken LED
+bool  btnDwn = false;          // Bir düğmeye basılıp basılmadığını kontrol etmek için kullanılır
+bool wait =  false;            // Kullanıcının bir düğmeye basmasını bekleyen programdır
+bool  resetFlag = false;       // Oyuncunun bir kez kaybettiğini programa belirtmek için kullanılır
 
-byte soundPin = 11;            // Speaker output
+byte soundPin = 11;            // Buzzer output
 
-byte noPins =  4;              // Number of buttons/LEDs (While working on this, I was using only  2 LEDs)
-                              // You could make the game harder by adding  an additional LED/button/resistors combination.
-byte pins[] = {2, 3, 4, 5};  // Button input pins and LED ouput pins - change these vaules if you wwant to connect  yourbuttons to other pins
-                              // The number of elements  must match noPins below
+byte noPins =  4;              // Düğme / LED sayısı 
+                              // Ek bir LED / düğme / direnç kombinasyonu ekleyerek oyunu zorlaştırabilirsiniz.
+byte pins[] = {2, 3, 4, 5};  // Buton giriş pimleri ve LED çıkış pimleri - düğmelerinizi diğer pinlere bağlamak istiyorsanız bu anahtarları değiştirin
+                              // Öğe sayısı aşağıdaki noPins ile eşleşmelidir
                               
-long inputTime = 0;           // Timer variable for the delay between user inputs
+long inputTime = 0;           // Kullanıcı girişleri arasındaki gecikme için zamanlayıcı değişkeni
 
 void setup()  {
-  delay(3000);                // This is to give me time to breathe after connection  the arduino - can be removed if you want
-  Serial.begin(9600);         // Start  Serial monitor. This can be removed too as long as you remove all references to  Serial below
+  delay(3000);                // Bu, arduino'yu bağladıktan sonra nefes almam için bana zaman vermek içindir 
+  Serial.begin(9600);         // Seri monitörü başlat. Aşağıdaki Seriye yapılan tüm referansları kaldırdığınız sürece kaldırılabilir
   Reset();
 }
 
 ///
-/// Sets all the pins as either INPUT  or OUTPUT based on the value of 'dir'
+/// Tüm pimleri 'dir' değerine göre GİRİŞ veya çıkış olarak ayarlar
 ///
 void setPinDirection(byte dir){
   for(byte i = 0; i < noPins; i++){
@@ -33,14 +33,14 @@ void setPinDirection(byte dir){
   }
 }
 
-//send  the same value to all the LED pins
+// Tüm LED pinlerine aynı değeri gönderin
 void writeAllPins(byte val){
   for(byte  i = 0; i < noPins; i++){
     digitalWrite(pins[i], val); 
   }
 }
 
-//Makes  a (very annoying :) beep sound
+// Çok sinir bozucu :) bir bip sesi çıkarır
 void beep(byte freq){
   analogWrite(soundPin,  2);
   delay(freq);
@@ -49,8 +49,8 @@ void beep(byte freq){
 }
 
 ///
-///  Flashes all the LEDs together
-/// freq is the blink speed - small number -> fast  | big number -> slow
+///  Tüm LED'leri birlikte yanıp söner
+/// freq yanıp sönme hızıdır - küçük sayı -> hızlı / büyük sayı -> yavaş
 ///
 void flash(short freq){
   setPinDirection(OUTPUT);  /// We're activating the LEDS now
@@ -64,7 +64,7 @@ void flash(short freq){
 }
 
 ///
-///This function resets all the game variables to their default  values
+/// Bu işlev tüm oyun değişkenlerini varsayılan değerlerine sıfırlar
 ///
 void Reset(){
   flash(500);
@@ -78,18 +78,18 @@ void Reset(){
 }
 
 ///
-/// User lost
+/// Oyuncu kaybetti
 ///
 void Lose(){
   flash(50);  
 }
 
 ///
-/// The arduino shows the user what must be memorized
-///  Also called after losing to show you what you last sequence was
+/// Arduino kullanıcıya neyin ezberlenmesi gerektiğini gösterir
+///  Ayrıca kaybettikten sonra son dizinizin ne olduğunu göstermek için çağrılır
 ///
 void playSequence(){
-  //Loop through the stored sequence and light the appropriate LEDs in turn
+  // Saklanan sıra boyunca döngü yapın ve sırayla uygun LED'leri yakın
   for(int i = 0; i < curLen; i++){
       Serial.print("Seq: ");
       Serial.print(i);
@@ -103,83 +103,83 @@ void playSequence(){
 }
 
 ///
-/// The events that occur upon a loss
+/// Bir kayıp üzerine meydana gelen olaylar
 ///
 void DoLoseProcess(){
-  Lose();             // Flash all the LEDS quickly (see Lose function)
+  Lose();             // Tüm LED'leri hızlı bir şekilde yanıp söner
   delay(1000);
-  playSequence();     // Shows the user the last sequence - So you can count remember  your best score - Mine's 22 by the way :)
+  playSequence();     // Kullanıcıya son diziyi gösterir - Böylece en iyi puanınızı hatırlayabilirsiniz
   delay(1000);
-  Reset();            //  Reset everything for a new game
+  Reset();            //  Yeni bir oyun için her şeyi sıfırla
 }
 
 ///
-/// Where the magic happens
+///  Bütün oyunun gerçekleştiği yer
 ///
 void  loop() {  
   if(!wait){      
                             //****************//
-                            // Arduino's turn //
+                            // Arduino'nun sırası //
                             //****************//
-    setPinDirection(OUTPUT);                      // We're using the LEDs
+    setPinDirection(OUTPUT);                      // LED'leri kullanıyoruz
     
     randomSeed(analogRead(A0));                   // https://www.arduino.cc/en/Reference/RandomSeed
-    sequence[curLen] = pins[random(0,noPins)];    // Put a new random value in the  next position in the sequence -  https://www.arduino.cc/en/Reference/random
-    curLen++;                                     // Set the new Current length  of the sequence
+    sequence[curLen] = pins[random(0,noPins)];    // Sıradaki bir sonraki konuma yeni bir rastgele değer koyun -  https://www.arduino.cc/en/Reference/random
+    curLen++;                                     // Dizinin yeni Geçerli uzunluğunu ayarlayın
     
-    playSequence();                               //  Show the sequence to the player
-    beep(50);                                     //  Make a beep for the player to be aware
+    playSequence();                               //  Diziyi oynatıcıya göster
+    beep(50);                                     //  Oynatıcının farkında olması için bir bip sesi çıkarın
     
-    wait = true;                                  //  Set Wait to true as it's now going to be the turn of the player
-    inputTime  = millis();                         // Store the time to measure the player's response  time
+    wait = true;                                  //  Wait'i true olarak ayarlayın, çünkü şimdi oyuncunun sırası olacak
+    inputTime  = millis();                         //  Oyuncunun tepki süresini ölçmek için zamanı saklayın
   }else{ 
                             //***************//
-                            //  Player's turn //
+                            //  Oyuncunun sırası //
                             //***************//
-    setPinDirection(INPUT);                       // We're using the buttons
+    setPinDirection(INPUT);                       // Butonları kullanıyoruz
 
-    if(millis() - inputTime  > PLAYER_WAIT_TIME){  // If the player takes more than the allowed time,
-      DoLoseProcess();                            // All is lost :(
+    if(millis() - inputTime  > PLAYER_WAIT_TIME){  // Oyuncu izin verilen süreden fazla sürerse,
+      DoLoseProcess();                            // Oyun biter :(
       return;
     }      
         
     if(!btnDwn){                                  // 
-      expRd  = sequence[inputCount];               // Find the value we expect from the player
-      Serial.print("Expected: ");                 // Serial Monitor Output - Should  be removed if you removed the Serial.begin above
-      Serial.println(expRd);                      // Serial Monitor Output - Should be removed if you removed  the Serial.begin above
+      expRd  = sequence[inputCount];               // Oynatıcıdan beklediğimiz değeri bulun
+      Serial.print("Expected: ");                 // Serial Monitor Output - Seriyi kaldırdıysanız kaldırılmalıdır.
+      Serial.println(expRd);                      // Beklenen :
       
-      for(int i = 0; i < noPins; i++){           //  Loop through the all the pins
+      for(int i = 0; i < noPins; i++){           //  Tüm pimler arasında döngü yapın
         if(pins[i]==expRd)                        
-          continue;                               // Ignore the correct pin
-        if(digitalRead(pins[i]) == HIGH){         // Is the buttong pressed
+          continue;                               // Doğru pın'i yoksay
+        if(digitalRead(pins[i]) == HIGH){         // Düğmeye basıldı mı
           lastInput = pins[i];
-          resetFlag = true;                       //  Set the resetFlag - this means you lost
-          btnDwn = true;                          //  This will prevent the program from doing the same thing over and over again
+          resetFlag = true;                       //  Resetflag'ı ayarlayın - bu, kaybettiğiniz anlamına gelir
+          btnDwn = true;                          //  Bu, programın aynı şeyi tekrar tekrar yapmasını engelleyecektir
           Serial.print("Read: ");                 // Serial Monitor Output - Should  be removed if you removed the Serial.begin above
           Serial.println(lastInput);              // Serial Monitor Output - Should be removed if you removed the Serial.begin  above
         }
       }      
     }
 
-    if(digitalRead(expRd) ==  1 && !btnDwn)        // The player pressed the right button
+    if(digitalRead(expRd) ==  1 && !btnDwn)        // Oyuncu sağ düğmeye bastı
     {
       inputTime  = millis();                       // 
       lastInput = expRd;
-      inputCount++;                               // The user pressed a (correct) button again
-      btnDwn = true;                              // This will prevent the program  from doing the same thing over and over again
-      Serial.print("Read: ");                     // Serial Monitor Output - Should be removed if you removed  the Serial.begin above
-      Serial.println(lastInput);                  // Serial  Monitor Output - Should be removed if you removed the Serial.begin above
+      inputCount++;                               // Kullanıcı tekrar (doğru) bir düğmeye bastı
+      btnDwn = true;                              // Bu, programın aynı şeyi tekrar tekrar yapmasını engelleyecektir
+      Serial.print("Read: ");                     // Serial Monitor Output - Seriyi kaldırdıysanız kaldırılmalıdır.
+      Serial.println(lastInput);                  // 
     }else{
-      if(btnDwn && digitalRead(lastInput) == LOW){  // Check if the player released  the button
+      if(btnDwn && digitalRead(lastInput) == LOW){  // Oynatıcının butonu bırakıp bırakmadığını kontrol edin
         btnDwn = false;
         delay(20);
-        if(resetFlag){                              // If this was set to true up above, you lost
-          DoLoseProcess();                          // So we do the losing sequence  of events
+        if(resetFlag){                              // Bu yukarıda true olarak ayarlanmışsa, kaybettiniz
+          DoLoseProcess();                          // olayların kaybetme sırası yapılır
         }
         else{
-          if(inputCount == curLen){                 //  Has the player finished repeating the sequence
-            wait = false;                           //  If so, this will make the next turn the program's turn
-            inputCount  = 0;                         // Reset the number of times that the player has pressed  a button
+          if(inputCount == curLen){                 //  Oyuncu diziyi tekrarlamayı bitirdi mi
+            wait = false;                           //  Eğer öyleyse, bu bir sonraki dönüşü programın dönüşünü sağlayacaktır
+            inputCount  = 0;                         // Oynatıcının bir düğmeye kaç kez bastığını sıfırlayın
             delay(1500);
           }
         }

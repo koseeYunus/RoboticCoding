@@ -1,18 +1,20 @@
-int buzzerPin=3;
-int pot=A0;
-int potDeger=0;
+int buzzerPin=6;
+int ledPin=5;
 void setup() {
   pinMode(buzzerPin, OUTPUT);
-  pinMode(pot, INPUT);
+  pinMode(ledPin, OUTPUT);
   Serial.begin(9600);
 
 }
 
 void loop() {
-  potDeger=analogRead(pot);
-  Serial.println(potDeger);
-  analogWrite(buzzerPin, potDeger);
-  delay(1000);
+  digitalWrite(buzzerPin, HIGH);
+  digitalWrite(ledPin, LOW);
+  Serial.println("buzzer caldi, led sondu.")
+  delay(750);
   digitalWrite(buzzerPin, LOW);
-  delay(1000);
+  digitalWrite(ledPin, HIGH);
+  Serial.println("buzzer sustu, led yandi.")
+  delay(750);
+  
 }

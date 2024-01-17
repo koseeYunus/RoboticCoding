@@ -127,6 +127,7 @@ void loop() {
 
         case ir7:
           lastValue = ir7;
+          solider();
           break;
 
         case ir8:
@@ -145,7 +146,7 @@ void loop() {
 
         case irStar:
           lastValue = irStar;
-          center();
+          solider();
           break;
 
         case irPound:
@@ -357,6 +358,21 @@ void getUp(){
   OnSagAlt.write(180);
   OnSolAlt.write(0);//
   delay(100);
+}
+
+void solider(){
+  center();
+  delay(1000);
+  upOpen(); 
+  delay(1000);
+  upClose();
+  
+  delay(1000);
+  sitDown();
+  delay(1000);
+  getUp();
+  delay(1000);
+  center();
 }
 
 void respect(){
